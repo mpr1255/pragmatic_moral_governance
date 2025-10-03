@@ -4,7 +4,7 @@
 
 This public repository contains the end-to-end code used to transform raw municipal regulations into the quantitative outputs, figures, and explanatory tables discussed in the paper. Each top-level folder corresponds to a specific phase of the workflow—cleaning and structuring the corpus, computing similarity scores, generating publication graphics, and curating explanatory documents. Downstream stages consume the artefacts produced by earlier steps, so running `make all` reconstructs the entire analysis chain from scratch (aside from large intermediate caches that are regenerated locally).
 
-## 🧭 Workflow Overview
+## Workflow Overview
 
 ```
 task2_cleanup_and_build_database  ──►  task3_analyse_data  ──►  task4_shuoming_jiedu
@@ -18,7 +18,7 @@ task2_cleanup_and_build_database  ──►  task3_analyse_data  ──►  task
 
 All heavy artefacts (embeddings, similarity CSVs, cached translations) are omitted from the repository and regenerated locally by the `Makefile` targets when needed.
 
-## 🎯 Quick Start
+## Quick Start
 
 ```bash
 # Clone and run the complete analysis
@@ -38,7 +38,7 @@ make final-figures
 make all
 ```
 
-## 📊 Research Overview
+## Research Overview
 
 This project analyzes Chinese municipal "Promotion of Civilised Behaviour" (文明行为促进) regulations using:
 - **Keyword-based similarity analysis** across 9 behavioral categories
@@ -51,7 +51,7 @@ This project analyzes Chinese municipal "Promotion of Civilised Behaviour" (文�
 
 > **Note**: This repository contains only the analysis code. Large data files (>50MB) are excluded and must be obtained separately or regenerated locally.
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 ├── Makefile                        # Orchestrates the end-to-end build
@@ -80,7 +80,7 @@ This project analyzes Chinese municipal "Promotion of Civilised Behaviour" (文�
 
 Re-running any stage will rebuild its artefacts without modifying earlier layers, so you can iterate locally on, for example, new visualisations in `task3` while reusing existing embeddings from `task2`.
 
-## 🎨 Publication Outputs
+## Publication Outputs
 
 The pipeline generates exactly **3 figures** used in the publication:
 
@@ -90,7 +90,7 @@ The pipeline generates exactly **3 figures** used in the publication:
 
 Plus **reliability analysis** (Krippendorff's alpha) for all analysis levels.
 
-## ⚙️ System Requirements
+## System Requirements
 
 ### Required Software
 - **R** (4.0+) with packages auto-installed via `librarian::shelf()`
@@ -114,7 +114,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Windows: Download from https://cran.r-project.org/
 ```
 
-## 🚀 Usage
+## Usage
 
 ### Main Commands
 ```bash
@@ -125,14 +125,15 @@ make verify                # Check pipeline status
 make help                  # Show all available commands
 ```
 
-### Development Commands  
+### Development Commands
+
 ```bash
 make embeddings            # Generate embeddings (expensive!)
 make keyword-similarities  # Generate similarity data
 make clean-graphs          # Clean visualizations only (safe)
 ```
 
-## 📁 Data Pipeline
+## Data Pipeline
 
 ```mermaid
 graph TD
@@ -152,7 +153,7 @@ graph TD
 - **Embeddings**: `*_embeddings.csv` files (~17K total text units)
 - **Similarities**: `*_similarities.csv` files (keyword-text similarity scores)
 
-## 🔍 Nine Behavioral Categories
+## Nine Behavioral Categories
 
 1. **Public Order** (public_order) - Safety, traffic, noise regulations
 2. **Public Etiquette** (public_etiquette) - Courtesy, respect, social manners  
@@ -164,7 +165,7 @@ graph TD
 8. **Voluntary Work** (voluntary_work) - Community service, charity
 9. **Socialist Core Values** (socialist_core_values) - Ideological principles
 
-## 🧹 Cleaning Up
+## Cleaning Up
 
 ```bash
 make clean-graphs          # Remove visualizations (safe)
@@ -174,7 +175,7 @@ make clean-embeddings      # Remove embeddings (expensive to regenerate!)
 make clean-all             # Remove everything (requires confirmation)
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -202,13 +203,13 @@ Some generated files exceed 50MB (embeddings data) and are excluded from this re
 - Large files are automatically cached and won't regenerate unnecessarily
 - The complete analysis pipeline works from raw data to final figures
 
-## 📖 Documentation
+## Documentation
 
 - **[docs/PIPELINE.md](docs/PIPELINE.md)** - Detailed technical documentation
 - **Makefile** - Self-documenting build system (`make help`)
 - **Code comments** - All analysis scripts are documented
 
-## 📜 Citation
+## Citation
 
 If you use this code or data, please cite:
 
@@ -222,6 +223,6 @@ If you use this code or data, please cite:
 }
 ```
 
-## 📝 License
+## License
 
 [License to be specified]
