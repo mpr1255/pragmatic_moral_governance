@@ -6,7 +6,7 @@
 
 ```bash
 # Clone and run the complete analysis
-git clone https://github.com/[username]/pragmatic_moral_governance && cd pragmatic_moral_governance
+git clone https://github.com/mpr1255/pragmatic_moral_governance && cd pragmatic_moral_governance
 
 # Set up environment (copy and edit .env.example)
 cp .env.example .env
@@ -187,7 +187,7 @@ If you use this code or data, please cite:
   author={[Author names]},
   journal={[Journal name]},
   year={2024},
-  note={Analysis pipeline available at https://github.com/[username]/pragmatic_moral_governance}
+  note={Analysis pipeline available at https://github.com/mpr1255/pragmatic_moral_governance}
 }
 ```
 
