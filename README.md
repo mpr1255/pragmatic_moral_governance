@@ -1,6 +1,22 @@
 # Pragmatic Moral Governance Analysis Pipeline
 
-**Streamlined analysis pipeline for Chinese "Promotion of Civilised Behaviour" municipal regulations research.**
+**Data processing and build pipeline for the article _Pragmatic Moral Governance in Contemporary China: Regulating Order through Civilized Behavior Regulations_.**
+
+This public repository contains the end-to-end code used to transform raw municipal regulations into the quantitative outputs, figures, and explanatory tables discussed in the paper. Each top-level folder corresponds to a specific phase of the workflow—cleaning and structuring the corpus, computing similarity scores, generating publication graphics, and curating explanatory documents. Downstream stages consume the artefacts produced by earlier steps, so running `make all` reconstructs the entire analysis chain from scratch (aside from large intermediate caches that are regenerated locally).
+
+## 🧭 Workflow Overview
+
+```
+task2_cleanup_and_build_database  ──►  task3_analyse_data  ──►  task4_shuoming_jiedu
+        (corpus curation & embeddings)      (metrics & figures)        (explanatory docs)
+```
+
+- `task2_cleanup_and_build_database` ingests Section 2 text from the raw regulations, creates article/sentence/section splits, generates embeddings, and stores similarity metrics plus model-voting results. Its CSV and SQLite outputs feed the rest of the pipeline.
+- `task3_analyse_data` reads those similarity tables to produce the figures, tables, and statistics referenced in the paper. It also exports selected documents and translations for manual inspection.
+- `task4_shuoming_jiedu` houses the explanatory (说明 / 解读) document collection and the scripts that tag, normalise, and summarise those texts for qualitative context.
+- `docs/` records the technical documentation; `ref/` bundles stable lookup tables and illustrative examples shared in the publication.
+
+All heavy artefacts (embeddings, similarity CSVs, cached translations) are omitted from the repository and regenerated locally by the `Makefile` targets when needed.
 
 ## 🎯 Quick Start
 
@@ -38,16 +54,31 @@ This project analyzes Chinese municipal "Promotion of Civilised Behaviour" (文�
 ## 🗂️ Repository Structure
 
 ```
-├── Makefile                    # Main build pipeline
+├── Makefile                        # Orchestrates the end-to-end build
+├── docs/                           # Pipeline documentation and research notes
+├── ref/                            # Stable lookup tables and paper examples
 ├── task2_cleanup_and_build_database/
-│   ├── code/                   # Analysis scripts
-│   ├── out/                    # Generated data (embeddings, similarities)
-│   └── ref/                    # Reference data (keywords)
+│   ├── code/                       # Cleaning, embedding, and similarity scripts
+│   ├── ref/                        # Keyword dictionaries, prompt templates
+│   └── out/                        # (Generated) embeddings, similarity tables, databases
 ├── task3_analyse_data/
-│   ├── code/                   # Visualization scripts
-│   └── graphs_and_maps/        # Generated figures
-└── docs/                       # Documentation
+│   ├── code/                       # Figure generation, stats aggregation
+│   ├── docs/                       # Exported regulation corpus (regenerated on demand)
+│   ├── graphs_and_maps/            # (Generated) publication figures
+│   └── out/                        # (Generated) processed tables, translations
+└── task4_shuoming_jiedu/
+    ├── data/                       # Explanatory documents (说明/解读) collection
+    ├── analysis/                   # Scripts producing policy-theme tables
+    └── prompts/                    # LLM instructions for metadata extraction
 ```
+
+### How the stages link together
+
+1. **Corpus curation (task2)**: `_01_parse_json_and_create_csv.py` consolidates the raw regulation metadata; `_02*` scripts split text units and create embeddings; `_04*` scripts compute keyword similarities and store CSVs in `task2/out`. `make keyword-similarities` and `make embeddings` wrap these jobs.
+2. **Quantitative analysis (task3)**: R scripts like `generate_final_figures.R` and `join_clean_aggregate_visualise.R` read the sentence/article/section similarity tables from `task2/out`, aggregate them, and write publication-ready figures to `task3/graphs_and_maps`. The same stage exports translated excerpts and summary spreadsheets under `task3/out`.
+3. **Qualitative context (task4)**: Python utilities in `task4_shuoming_jiedu/analysis` load the SQLite database of explanatory documents, label policy themes, and export tables referenced in the paper. The markdown/HTML cache in `task4_shuoming_jiedu/data` is the curated source for these scripts.
+
+Re-running any stage will rebuild its artefacts without modifying earlier layers, so you can iterate locally on, for example, new visualisations in `task3` while reusing existing embeddings from `task2`.
 
 ## 🎨 Publication Outputs
 
