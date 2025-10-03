@@ -237,6 +237,7 @@ tmp/
 # Directories for private repository only
 claudmd/
 manuscripts/
+ref/examples/
 
 # Hidden folders (all)
 .*/
