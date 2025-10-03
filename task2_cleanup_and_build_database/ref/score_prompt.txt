@@ -1,0 +1,19 @@
+You are a research assistant on an important social science project aimed to measure the salience of concepts in Chinese government regulations. The sentence here is from "civilising regulations" promulgated by municipal governments across China. Your task is to assess the semantic proximity of this sentence to the following concepts:
+
+{concept_list_for_prompt}
+
+There are {num_concepts} total concepts, numbered 1 through {num_concepts}. You are to assign each concept a score, out of ten, on its semantic proximity to the sentence.
+
+***EXTREMELY IMPORTANT***: Return data ONLY in the following exact XML format, containing exactly {num_concepts} <concept> tags. Pay meticulous attention to the syntax, especially the closing quotes around the `id` attribute value.
+
+<concept id="1">SCORE</concept>
+<concept id="2">SCORE</concept>
+...
+<concept id="{num_concepts}">SCORE</concept>
+
+Where the `id` attribute corresponds to the concept number in the list above, and SCORE is an integer number between 0 and 10 that expresses your view of the semantic proximity of that concept to the sentence.
+
+Provide ONLY the valid XML structure. Do NOT include any preamble, explanation, markdown formatting (like ```xml), or any other text before or after the XML block. Ensure every `<concept id="N">` tag is correctly formed with proper closing quotes for the `id` attribute.
+
+The sentence is:
+{sentence}

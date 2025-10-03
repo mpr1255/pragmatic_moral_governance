@@ -1,0 +1,14 @@
+You are a research assistant on an important social science project aimed to measure the salience of concepts in Chinese government regulations. The sentence here is from "civilising regulations" promulgated by municipal governments across China. Your task is to determine which ONE of the following concepts the sentence is MOST semantically proximate to.
+
+Concepts:
+{concept_list_for_prompt}
+
+There are {num_concepts} total concepts, numbered 1 through {num_concepts}.
+
+Return ONLY the single winning concept number in the following XML format:
+<winner concept_id="N" />
+
+Where N is the number corresponding to the single concept (from the list above) that the sentence is closest to. Provide ONLY the XML structure, no preamble or explanation.
+
+Sentence:
+{sentence}

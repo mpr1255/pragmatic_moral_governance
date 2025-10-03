@@ -1,0 +1,112 @@
+# Extract province, city, title, year, and issuing agency from shuoming jiedu documents
+database: ./task4_shuoming_jiedu/shuoming_jiedu.db
+default_model: gpt-4.1
+
+sql_queries:
+  all_docs: |
+    SELECT rowid, sha1, * FROM documents
+    ORDER BY rowid
+
+enrichments:
+  - name: extract_document_metadata
+    description: "Extract province, city, title, year, and issuing agency from Chinese shuoming jiedu documents"
+    model: gpt-4.1
+    input:
+      query: all_docs
+      input_columns: ["raw_content", "filename"]
+    schema:
+      province: {type: "string", maxLength: 50}
+      city: {type: "string", maxLength: 50}
+      title: {type: "string", maxLength: 200}
+      year: {type: "integer", minimum: 2000, maximum: 2030}
+      issuing_agency: {type: "string", maxLength: 100}
+    output_column: metadata_extracted
+    output_table: enrichments
+    prompt: |
+      从这个中文文档中提取以下信息：
+
+      1. **省份 (Province)**: 文档涉及的省份名称（如：北京市、河南省、湖南省等）
+      2. **城市 (City)**: 文档涉及的具体城市名称（如：衡阳市、朝阳市、新乡市等）
+      3. **标题 (Title)**: 文档的正式标题或主题
+      4. **年份 (Year)**: 文档发布或涉及的年份（只返回4位数字年份）
+      5. **发布机构 (Issuing Agency)**: 发布或起草该文档的政府机构或部门
+
+      文档内容：
+      {raw_content}
+      
+      文件名：{filename}
+
+      请仔细分析文档内容，准确提取上述信息。如果某项信息无法确定，请返回空字符串（对于年份返回0）。
+
+      注意：
+      - 省份和城市名称要准确完整
+      - 标题要是完整的正式标题
+      - 年份必须是4位数字
+      - 发布机构要是完整的机构名称
+
+  - name: code_policy_themes
+    description: "Identify which policy themes are present in each document"
+    input:
+      query: all_docs
+      input_columns: ["raw_content"]
+    output_column: policy_themes
+    output_table: documents
+    schema:
+      policy_themes:
+        enum_list: ["P1", "P2", "B1", "B2", "L1", "L2"]
+        min_items: 0  # Document might have no themes
+        max_items: 6  # Could have all themes
+    model: gpt-4.1
+    prompt: |
+      Analyze this Chinese municipal document explaining why they promulgated civilized behavior regulations (文明行为促进条例).
+      
+      RESEARCH CONTEXT: We are studying how municipalities navigate between national political mandates, bureaucratic incentives, and local pragmatic needs when justifying moral governance legislation.
+      
+      IMPORTANT: Be selective. Only code themes that are EXPLICITLY mentioned as reasons for creating the regulation. Most documents will have 2-4 themes. Look for clear statements about WHY they made this law.
+      
+      Code ONLY themes with explicit justifications:
+      
+      **POLITICAL (National Directives)**
+      
+      P1: Implement National/Party Policy - Look for:
+      - "实施中央委员会决策部署" (implement Central Committee decisions) - Beijing example
+      - "党的十九大提出" (19th Party Congress proposed) - Suining example
+      - References to specific policies like "2016年《关于进一步把社会主义核心价值观融入法治建设的指导意见》" - Yanbian
+      - "依法治国与以德治国相结合" (combining rule by law with rule by virtue) - Beijing
+      
+      P2: Legalize/Institutionalize Spiritual Civilization - Look for:
+      - "推进精神文明建设法治化" (promote legalization of spiritual civilization) - Suining, Yanbian
+      - "精神文明建设法治化、常态化" (legalization and normalization) - Hengyang
+      - Converting moral guidance into legal framework
+      - "powerful legal guarantees" for spiritual civilization
+      
+      **BUREAUCRATIC (Administrative Incentives)**
+      
+      B1: Achieve/Maintain National Civilized City Status - Look for:
+      - "巩固我市作为全国文明城市" (consolidate our city as national civilized city) - Suining
+      - "创建全国文明城市的迫切需要" (urgent need to create national civilized city) - Yuncheng
+      - "全国文明城市网上申报材料的一项重要测评指标" (important evaluation indicator) - Shantou
+      - References to entering/maintaining civilized city ranks
+      
+      B2: Governance Modernization/Systematization - Look for:
+      - "加快社会治理现代化建设" (accelerate modernization of social governance) - Suining
+      - "城市管理法治化、规范化、常态化" (legalization, standardization, normalization of urban management) - Hengyang
+      - Systematic reform of governance structures
+      - Building comprehensive governance frameworks
+      
+      **LOCAL (Pragmatic Needs)**
+      
+      L1: Solve Urban Problems/Pain Points - Look for:
+      - "解决城市治理的痛点" (solving pain points of urban governance) - Beijing
+      - "不文明行为...给群众带来诸多不便" (uncivilized behaviors bring inconvenience to public) - Yanbian
+      - Specific problems mentioned: spitting, littering, noise, dogs, parking
+      - "满足人民群众的期待" (meet people's expectations) - Yanbian
+      
+      L2: Local Identity/Economic Development - Look for:
+      - "苏州城市精神融入" (integrate Suzhou city spirit) - Suzhou
+      - "建设国际航空大都市的精神支撑" (spiritual support for international aviation metropolis) - Ezhou
+      - "营造优良营商环境" (create good business environment) - Yuncheng
+      - References to local characteristics, competitiveness, investment
+      
+      Document content:
+      {raw_content}
